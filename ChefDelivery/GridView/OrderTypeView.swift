@@ -9,7 +9,11 @@ import SwiftUI
 
 struct OrderTypeView: View {
     
+    // MARK: - Attributes
+    
     let orderType: OrderType
+    
+    // MARK: - Body view
     
     var body: some View {
         VStack(spacing: 5){

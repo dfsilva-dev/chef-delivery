@@ -9,7 +9,11 @@ import SwiftUI
 
 struct CarouselItemView: View {
     
+    // MARK: - Attributes
+    
     let order: OrderType
+    
+    // MARK: - Body view
     
     var body: some View {
         Image(order.image)

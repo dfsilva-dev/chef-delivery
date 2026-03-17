@@ -9,9 +9,13 @@ import SwiftUI
 
 struct OrderTypeGridView: View {
     
+    // MARK: - Attributes
+    
     var gridLayout: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 10), count: 2)
     }
+    
+    // MARK: - Body view
     
     var body: some View {
         LazyHGrid(rows: gridLayout, spacing: 15){
