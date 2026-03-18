@@ -7,11 +7,20 @@
 
 import SwiftUI
 
+struct Notice: Identifiable {
+    var id: String
+    var message: String
+}
+
 struct ProductDetailView: View {
     
     // MARK: - Attributes
+    
     let product: ProductType
+    var service = HomeService()
+    var alertMessage : String?
     @State private var productQuantity = 1
+    @State private var notice: Notice?
     
     // MARK: - Body view
     
@@ -21,7 +30,32 @@ struct ProductDetailView: View {
             Spacer()
             ProductDetailQuantityView(productQuantity: $productQuantity)
             Spacer()
-            ProductDetailButtonView()
+            ProductDetailButtonView {
+                Task {
+                    await confirmOrder()
+                }
+            }.alert(item: $notice) { notice in
+                Alert(title: Text("Aviso"), message: Text(notice.message), dismissButton: .default(Text("OK")))
+            }
+        }
+    }
+    
+    // MARK: - Methods
+    
+    private func confirmOrder() async {
+        do {
+            let order = OrderPayload(product: product, amount: productQuantity)
+            let result = try await service.confirmOrder(order: order)
+            switch result {
+            case .success(_):
+                notice = Notice(id: "id", message: "Pedido realizado com sucesso")
+            case .failure(let error):
+                notice = Notice(id: "id", message: "Falha ao realizar pedido")
+                print(error.localizedDescription)
+            }
+        } catch {
+            notice = Notice(id: "id", message: "Falha ao solicitar pedido")
+            print(error.localizedDescription)
         }
     }
 }
@@ -30,15 +64,20 @@ struct ProductDetailView: View {
     ProductDetailView(product: storesMock[0].products[0])
 }
 
+// MARK: - Product Detail Button View
+
 struct ProductDetailButtonView: View {
+    
+    var onButtonPress: () -> Void
+    
     var body: some View {
         Button {
-            print("O botão foi pressionado")
+            onButtonPress()
         } label: {
             HStack {
                 Image(systemName: "cart")
                 
-                Text("Adicionar ao carrinho")
+                Text("Enviar pedido")
             }
             .padding(.horizontal, 32)
             .padding(.vertical, 16)
